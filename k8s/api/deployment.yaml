@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: api
-        image: joaochavesjr/api-produto:v1
+        image: joaochavesjr/api-produto:{{tag}}
         resources:
           limits:
             memory: "128Mi"
