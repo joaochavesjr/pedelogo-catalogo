@@ -18,7 +18,7 @@ pipeline {
             }
         }
 
-        stage('Push Image'){
+        stage('Push Image') {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
@@ -28,5 +28,26 @@ pipeline {
                 }                
             }
         }
+
+        stage('Deploy k8s'){
+            agent {
+                kubernetes {
+                    cloud 'kubernetes'
+                }
+            }
+            environment {
+                tag_version = "${env.BUILD_ID}"
+            }
+            steps {
+                script {
+                    sh 'sed -i "s/{{tag}}/$tag_version/g" ./k8s/api/deployment.yaml'
+                    sh 'cat ./k8s/api/depoyment.yaml'
+                    kubernetesDeploy(configs: '**/k8s/**', kubeconfigId: 'kubeconfig')
+                }
+
+            }
+
+        }
+
     }
 }
